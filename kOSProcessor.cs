@@ -26,20 +26,19 @@ namespace kOS
             Core.OpenWindow(cpu);
         }
 
-        [KSPEvent(guiActive = true, guiName = "Toggle Power")]
-        public void TogglePower()
+        [KSPEvent(guiActive = true,guiActiveUnfocused = true, guiName = "Toggle Power On")]
+        public void TogglePowerOn()
         {
-            if (cpu == null) return;
-
-            if (cpu.Mode != CPU.Modes.OFF)
-            {
-                cpu.Mode = CPU.Modes.OFF;
-            }
-            else
-            {
-                cpu.Mode = CPU.Modes.STARVED;
-            }
+            TogglePower();
         }
+
+        [KSPEvent(guiActive = true,guiActiveUnfocused = true, guiName = "Toggle Power Off")]
+        public void TogglePowerOff()
+        {
+            TogglePower();
+        }
+
+
                 
         [KSPAction("Open Terminal", actionGroup = KSPActionGroup.None)]
         public void Activate(KSPActionParam param) {
@@ -56,6 +55,20 @@ namespace kOS
 
         [KSPField(isPersistant = true, guiActive = false)]
         public int MaxPartID = 0;
+
+        public void TogglePower()
+        {
+            if (cpu == null) return;
+
+            if (cpu.Mode != CPU.Modes.OFF)
+            {
+                cpu.Mode = CPU.Modes.OFF;
+            }
+            else
+            {
+                cpu.Mode = CPU.Modes.STARVED;
+            }
+        }
 
         public override void OnStart(PartModule.StartState state)
         {
@@ -116,6 +129,9 @@ namespace kOS
         {
             if (cpu == null) return;
 
+            Events["TogglePowerOn"].active = Events["TogglePowerOn"].guiActiveUnfocused = cpu.Mode == CPU.Modes.OFF;
+            Events["TogglePowerOff"].active = Events["TogglePowerOff"].guiActiveUnfocused = cpu.Mode != CPU.Modes.OFF;
+            
             if (part.State == PartStates.DEAD)
             {
                 cpu.Mode = CPU.Modes.OFF;
